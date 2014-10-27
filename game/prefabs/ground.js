@@ -1,6 +1,6 @@
 'use strict';
 
-var Ground = function(game, x, y, width, height) {
+var Ground = function(game, x, y, width, height){
   Phaser.TileSprite.call(this, game, x, y, width, height, 'ground');
 
   this.autoScroll(-200, 0);
@@ -13,7 +13,7 @@ var Ground = function(game, x, y, width, height) {
 Ground.prototype = Object.create(Phaser.TileSprite.prototype);
 Ground.prototype.constructor = Ground;
 
-Ground.prototype.update = function() {
+Ground.prototype.update = function(){
 
 
 };

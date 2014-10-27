@@ -18,10 +18,10 @@ window.onload = function () {
 },{"./states/boot":6,"./states/gameover":7,"./states/menu":8,"./states/play":9,"./states/preload":10}],2:[function(require,module,exports){
 'use strict';
 
-var Bird = function(game, x, y, frame) {
+var Bird = function(game, x, y, frame){
   Phaser.Sprite.call(this, game, x, y, 'bird', frame);
 
-  this.anchor.setTo(0.5, 0.5);
+  this.anchor.setTo(-0.2, 0.5);
   this.animations.add('flap');
   this.animations.play('flap', 12, true);
   this.name = 'bird';
@@ -36,10 +36,10 @@ var Bird = function(game, x, y, frame) {
 Bird.prototype = Object.create(Phaser.Sprite.prototype);
 Bird.prototype.constructor = Bird;
 
-Bird.prototype.update = function() {
-  // rotate bird towards the ground if angle is less than 90
-  if(this.angle < 90){
-    this.angle += 2.5;
+Bird.prototype.update = function(){
+  // rotate bird towards the ground if angle is less than 25
+  if(this.angle < 25){
+    this.angle += 2;
   }
 
 };
@@ -48,7 +48,7 @@ Bird.prototype.flap = function(){
   this.body.velocity.y = -400;
 
   // rotate the bird to -40 degrees
-  this.game.add.tween(this).to({angle: -40}, 100).start();
+  this.game.add.tween(this).to({angle: -25}, 100).start();
 };
 
 module.exports = Bird;
@@ -56,7 +56,7 @@ module.exports = Bird;
 },{}],3:[function(require,module,exports){
 'use strict';
 
-var Ground = function(game, x, y, width, height) {
+var Ground = function(game, x, y, width, height){
   Phaser.TileSprite.call(this, game, x, y, width, height, 'ground');
 
   this.autoScroll(-200, 0);
@@ -69,7 +69,7 @@ var Ground = function(game, x, y, width, height) {
 Ground.prototype = Object.create(Phaser.TileSprite.prototype);
 Ground.prototype.constructor = Ground;
 
-Ground.prototype.update = function() {
+Ground.prototype.update = function(){
 
 
 };
@@ -79,7 +79,7 @@ module.exports = Ground;
 },{}],4:[function(require,module,exports){
 'use strict';
 
-var Pipe = function(game, x, y, frame) {
+var Pipe = function(game, x, y, frame){
   Phaser.Sprite.call(this, game, x, y, 'pipe', frame);
 
   this.anchor.setTo(0.5, 0.5);
@@ -93,7 +93,7 @@ var Pipe = function(game, x, y, frame) {
 Pipe.prototype = Object.create(Phaser.Sprite.prototype);
 Pipe.prototype.constructor = Pipe;
 
-Pipe.prototype.update = function() {
+Pipe.prototype.update = function(){
 
   // write your prefab's specific update code here
 
@@ -106,7 +106,7 @@ module.exports = Pipe;
 
 var Pipe = require('./pipe');
 
-var PipeGroup = function(game, parent) {
+var PipeGroup = function(game, parent){
   Phaser.Group.call(this, game, parent);
 
   this.topPipe = new Pipe(this.game, 0, 0, 0);
@@ -122,15 +122,15 @@ var PipeGroup = function(game, parent) {
 PipeGroup.prototype = Object.create(Phaser.Group.prototype);
 PipeGroup.prototype.constructor = PipeGroup;
 
-//PipeGroup.prototype.update = function(){
-//  this.checkWorldBounds();
-//};
+PipeGroup.prototype.update = function(){
+  this.checkWorldBounds();
+};
 
-//PipeGroup.prototype.checkWorldBounds = function(){
-//  if(!this.topPipe.inWorld){
-//    this.exists = false;
-//  }
-//};
+PipeGroup.prototype.checkWorldBounds = function(){
+  if(!this.topPipe.inWorld){
+    this.exists = false;
+  }
+};
 
 PipeGroup.prototype.reset = function(x, y){
   this.topPipe.reset(0,0);
@@ -195,12 +195,12 @@ module.exports = GameOver;
 },{}],8:[function(require,module,exports){
 
 'use strict';
-function Menu() {}
+function Menu(){}
 
 Menu.prototype = {
-  preload: function() {
+  preload: function(){
   },
-  create: function() {
+  create: function(){
     this.background = this.game.add.sprite(0, 0, 'background');
     this.ground = this.game.add.tileSprite(0, 400, 335, 112, 'ground');
     this.ground.autoScroll(-200, 0);
@@ -222,10 +222,10 @@ Menu.prototype = {
     this.startButton = this.game.add.button(this.game.width/2, 300, 'startButton', this.startClick, this);
     this.startButton.anchor.setTo(0.5, 0.5);
   },
-  startClick: function() {
+  startClick: function(){
     this.game.state.start('play');
   },
-  update: function() {
+  update: function(){
   }
 };
 
@@ -239,9 +239,9 @@ module.exports = Menu;
   var Ground = require('../prefabs/ground');
   var PipeGroup = require('../prefabs/pipeGroup');
 
-  function Play() {}
+  function Play(){}
   Play.prototype = {
-    create: function() {
+    create: function(){
       this.game.physics.startSystem(Phaser.Physics.ARCADE);
       this.game.physics.arcade.gravity.y = 1000;
 
@@ -267,35 +267,43 @@ module.exports = Menu;
       this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
 
       // add a timer
-      this.pipeGenerator = this.game.time.events.loop(Phaser.Timer.SECOND * 1.25, this.generatePipes, this);
+      this.pipeGenerator = this.game.time.events.loop(Phaser.Timer.SECOND * 1.5, this.generatePipes, this);
       this.pipeGenerator.timer.start();
     },
-    update: function() {
-      this.game.physics.arcade.collide(this.bird, this.ground);
+    update: function(){
+      this.game.physics.arcade.collide(this.bird, this.ground, this.deathHandler, null, this);
 
-//      this.pipes.forEach(function(pipeGroup){
-//        this.game.physics.arcade.collide(this.bird, pipeGroup, this.deathHandler, null, this);
-//      }, this);
+      this.pipes.forEach(function(pipeGroup){
+        this.game.physics.arcade.collide(this.bird, pipeGroup, this.deathHandler, null, this);
+      }, this);
     },
     generatePipes: function(){
       var pipeY = this.game.rnd.integerInRange(-100, 100);
-      var pipeGroup = new PipeGroup(this.game);
-      pipeGroup.x = this.game.width;
-      pipeGroup.y = pipeY;
-//      if(!pipeGroup){
-//        pipeGroup = new PipeGroup(this.game, this.pipes);
-//      }
-//      pipeGroup.reset(this.game.width + pipeGroup.width/2, pipeY);
-    }
+      var pipeGroup = this.pipes.getFirstExists(false);
+//      pipeGroup.x = this.game.width;
+//      pipeGroup.y = pipeY;
+      if(!pipeGroup){
+        pipeGroup = new PipeGroup(this.game, this.pipes);
+      }
+      pipeGroup.reset(this.game.width + pipeGroup.width/2, pipeY);
+    },
 
-//    deathHandler: function(){
-//      this.game.state.start('gameover');
-//    },
-//    shutdown: function(){
-//      this.game.input.keyboard.removeKey(Phaser.Keyboard.SPACEBAR);
-//      this.bird.destroy();
-//      this.pipes.destroy();
-//    }
+    generateBird: function(){
+      var bird = this.birdGroup.getFirstExists(false);
+      if(!bird){
+        bird = new Bird(this.game, x, y);
+        this.birdGroup.add(bird);
+      }
+      bird.reset(x,y);
+    },
+    deathHandler: function(){
+      this.game.state.start('gameover');
+    },
+    shutdown: function(){
+      this.game.input.keyboard.removeKey(Phaser.Keyboard.SPACEBAR);
+      this.bird.destroy();
+      this.pipes.destroy();
+    }
   };
 
   module.exports = Play;
@@ -303,13 +311,13 @@ module.exports = Menu;
 },{"../prefabs/bird":2,"../prefabs/ground":3,"../prefabs/pipeGroup":5}],10:[function(require,module,exports){
 
 'use strict';
-function Preload() {
+function Preload(){
   this.asset = null;
   this.ready = false;
 }
 
 Preload.prototype = {
-  preload: function() {
+  preload: function(){
     this.asset = this.add.sprite(this.width/2,this.height/2, 'preloader');
     this.asset.anchor.setTo(0.5, 0.5);
 
@@ -324,15 +332,15 @@ Preload.prototype = {
     this.load.spritesheet('bird', 'assets/bird.png', 34, 24, 3);
     this.load.spritesheet('pipe', 'assets/pipes.png', 54, 320, 2);
   },
-  create: function() {
+  create: function(){
     this.asset.cropEnabled = false;
   },
-  update: function() {
-    if(!!this.ready) {
-      this.game.state.start('play');
+  update: function(){
+    if(!!this.ready){
+      this.game.state.start('menu');
     }
   },
-  onLoadComplete: function() {
+  onLoadComplete: function(){
     this.ready = true;
   }
 };

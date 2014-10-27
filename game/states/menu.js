@@ -1,11 +1,11 @@
 
 'use strict';
-function Menu() {}
+function Menu(){}
 
 Menu.prototype = {
-  preload: function() {
+  preload: function(){
   },
-  create: function() {
+  create: function(){
     this.background = this.game.add.sprite(0, 0, 'background');
     this.ground = this.game.add.tileSprite(0, 400, 335, 112, 'ground');
     this.ground.autoScroll(-200, 0);
@@ -27,10 +27,10 @@ Menu.prototype = {
     this.startButton = this.game.add.button(this.game.width/2, 300, 'startButton', this.startClick, this);
     this.startButton.anchor.setTo(0.5, 0.5);
   },
-  startClick: function() {
+  startClick: function(){
     this.game.state.start('play');
   },
-  update: function() {
+  update: function(){
   }
 };
 

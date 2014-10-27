@@ -2,7 +2,7 @@
 
 var Pipe = require('./pipe');
 
-var PipeGroup = function(game, parent) {
+var PipeGroup = function(game, parent){
   Phaser.Group.call(this, game, parent);
 
   this.topPipe = new Pipe(this.game, 0, 0, 0);
@@ -18,15 +18,15 @@ var PipeGroup = function(game, parent) {
 PipeGroup.prototype = Object.create(Phaser.Group.prototype);
 PipeGroup.prototype.constructor = PipeGroup;
 
-//PipeGroup.prototype.update = function(){
-//  this.checkWorldBounds();
-//};
+PipeGroup.prototype.update = function(){
+  this.checkWorldBounds();
+};
 
-//PipeGroup.prototype.checkWorldBounds = function(){
-//  if(!this.topPipe.inWorld){
-//    this.exists = false;
-//  }
-//};
+PipeGroup.prototype.checkWorldBounds = function(){
+  if(!this.topPipe.inWorld){
+    this.exists = false;
+  }
+};
 
 PipeGroup.prototype.reset = function(x, y){
   this.topPipe.reset(0,0);
