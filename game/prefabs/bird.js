@@ -4,11 +4,14 @@ var Bird = function(game, x, y, frame) {
   Phaser.Sprite.call(this, game, x, y, 'bird', frame);
 
   this.anchor.setTo(0.5, 0.5);
-
   this.animations.add('flap');
   this.animations.play('flap', 12, true);
+  this.name = 'bird';
 
   this.game.physics.arcade.enableBody(this);
+
+  this.checkWorldBounds = true;
+  this.outOfBoundsKill = true;
 
 };
 

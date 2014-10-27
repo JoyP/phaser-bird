@@ -3,6 +3,7 @@
 
   var Bird = require('../prefabs/bird');
   var Ground = require('../prefabs/ground');
+  var PipeGroup = require('../prefabs/pipeGroup');
 
   function Play() {}
   Play.prototype = {
@@ -15,10 +16,12 @@
       this.bird = new Bird(this.game, 100, this.game.height/2);
       this.game.add.existing(this.bird);
 
+      this.pipes = this.game.add.group();
+
       this.ground = new Ground(this.game, 0, 400, 335, 112);
       this.game.add.existing(this.ground);
 
-      this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
+
 
       // add keyboard controls
       var flapKey = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
@@ -27,10 +30,38 @@
       // add mouse/touch controls
       this.input.onDown.add(this.bird.flap, this.bird);
 
+      this.game.input.keyboard.addKeyCapture([Phaser.Keyboard.SPACEBAR]);
+
+      // add a timer
+      this.pipeGenerator = this.game.time.events.loop(Phaser.Timer.SECOND * 1.25, this.generatePipes, this);
+      this.pipeGenerator.timer.start();
     },
     update: function() {
       this.game.physics.arcade.collide(this.bird, this.ground);
+
+//      this.pipes.forEach(function(pipeGroup){
+//        this.game.physics.arcade.collide(this.bird, pipeGroup, this.deathHandler, null, this);
+//      }, this);
     },
+    generatePipes: function(){
+      var pipeY = this.game.rnd.integerInRange(-100, 100);
+      var pipeGroup = new PipeGroup(this.game);
+      pipeGroup.x = this.game.width;
+      pipeGroup.y = pipeY;
+//      if(!pipeGroup){
+//        pipeGroup = new PipeGroup(this.game, this.pipes);
+//      }
+//      pipeGroup.reset(this.game.width + pipeGroup.width/2, pipeY);
+    }
+
+//    deathHandler: function(){
+//      this.game.state.start('gameover');
+//    },
+//    shutdown: function(){
+//      this.game.input.keyboard.removeKey(Phaser.Keyboard.SPACEBAR);
+//      this.bird.destroy();
+//      this.pipes.destroy();
+//    }
   };
 
   module.exports = Play;

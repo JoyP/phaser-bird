@@ -7,9 +7,10 @@ function Preload() {
 
 Preload.prototype = {
   preload: function() {
-    this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
     this.asset = this.add.sprite(this.width/2,this.height/2, 'preloader');
     this.asset.anchor.setTo(0.5, 0.5);
+
+    this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
     this.load.setPreloadSprite(this.asset);
 
     this.load.image('background', 'assets/background.png');
@@ -18,6 +19,7 @@ Preload.prototype = {
     this.load.image('startButton', 'assets/start-button.png');
 
     this.load.spritesheet('bird', 'assets/bird.png', 34, 24, 3);
+    this.load.spritesheet('pipe', 'assets/pipes.png', 54, 320, 2);
   },
   create: function() {
     this.asset.cropEnabled = false;
